@@ -3,8 +3,9 @@ from streamlit_lottie import st_lottie
 import requests
 import time
 
-# --- 1. 보안 설정 ---
+# --- 1. 보안 설정 (키 이름 'ELEVENLABS_API' 적용) ---
 try:
+    # 깃허브 Secrets와 이름을 정확히 일치시켰습니다.
     API_KEY_ELEVEN = st.secrets["ELEVENLABS_API"] 
     API_KEY_GROQ = st.secrets["GROQ_API_KEY"]
     VOICE_ID = st.secrets.get("VOICE_ID", "EXAVITQu4vr4xnNLMQer")
@@ -58,7 +59,7 @@ def generate_audio(text):
         return res.content if res.status_code == 200 else None
     except: return None
 
-# --- 4. 초강력 중앙 정렬 & 둥둥 효과 CSS ---
+# --- 4. 초강력 중앙 정렬 & 둥둥 효과 CSS (그림 안 깨지게 수정) ---
 st.set_page_config(page_title="로즈샘 고민상담소", layout="centered")
 
 st.markdown("""
@@ -82,17 +83,15 @@ st.markdown("""
     }
 
     /* 3. 이미지(로즈샘) 정중앙 고정 및 둥둥 애니메이션 */
-    .rose-img-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        margin-bottom: 20px;
+    [data-testid="stImage"] {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        animation: float_rose 3s ease-in-out infinite !important;
     }
     
-    .rose-img-container img {
-        width: 220px;
-        animation: float_rose 3s ease-in-out infinite;
+    [data-testid="stImage"] img {
+        width: 220px !important;
     }
 
     @keyframes float_rose {
@@ -114,8 +113,8 @@ if "rose_state" not in st.session_state: st.session_state.rose_state = "rose_idl
 
 # --- 6. 프로필 설정 페이지 (MBTI & 난이도 추가) ---
 if st.session_state.page == "profile":
-    # 이미지를 HTML로 감싸서 중앙 정렬 강제 적용
-    st.markdown(f'<div class="rose-img-container"><img src="https://raw.githubusercontent.com/{st.secrets.get("GITHUB_USER", "maykim")}/rose/main/rose_happy.png"></div>', unsafe_allow_html=True)
+    # st.image를 다시 사용해서 그림 깨짐 방지
+    st.image("rose_happy.png", width=220)
     st.markdown("## 로즈샘이 널 더 알고 싶어! 🌹")
     
     with st.form("profile"):
@@ -138,7 +137,8 @@ if st.session_state.page == "profile":
 
 # --- 7. 모드 선택 페이지 ---
 elif st.session_state.page == "mode_select":
-    st.markdown(f'<div class="rose-img-container"><img src="https://raw.githubusercontent.com/{st.secrets.get("GITHUB_USER", "maykim")}/rose/main/rose_smart.png"></div>', unsafe_allow_html=True)
+    # st.image 사용
+    st.image("rose_smart.png", width=220)
     st.markdown(f"### {st.session_state.user_info['name']}님, 반가워!")
     
     if st.button("🌹 친근한 반말 모드"): st.session_state.mode = "반말"; st.session_state.page = "chat"; st.rerun()
@@ -146,14 +146,14 @@ elif st.session_state.page == "mode_select":
 
 # --- 8. 채팅 페이지 ---
 elif st.session_state.page == "chat":
-    # 채팅화면의 로즈샘도 중앙 정렬 HTML 적용
-    st.markdown(f'<div class="rose-img-container"><img src="https://raw.githubusercontent.com/{st.secrets.get("GITHUB_USER", "maykim")}/rose/main/{st.session_state.rose_state}"></div>', unsafe_allow_html=True)
+    # st.image 사용
+    st.image(st.session_state.rose_state, width=220)
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]): st.write(msg["content"])
 
     if prompt := st.chat_input("로즈샘에게 궁금한 걸 물어봐!"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.messages.append({"role": "user", "content": prompt})
         st.session_state.rose_state = "rose_think.png"
         st.session_state.is_thinking = True
         st.rerun()
