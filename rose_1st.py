@@ -5,7 +5,7 @@ import time
 
 # --- 1. 보안 설정 (반드시 Streamlit Cloud Secrets에 키를 넣으세요!) ---
 try:
-    ELEVEN_API_KEY = st.secrets["ELEVENLABS_API"] 
+    ELEVEN_KEY = st.secrets["ELEVENLABS_API"] 
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
     VOICE_ID = st.secrets.get("VOICE_ID", "EXAVITQu4vr4xnNLMQer")
 except Exception as e:
